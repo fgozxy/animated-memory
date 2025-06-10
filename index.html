@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香草榜 - 创意排行榜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ranking-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .ranking-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .ranking-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ranking-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .ranking-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 20px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .ranking-number.first {
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+        }
+
+        .ranking-number.second {
+            color: #C0C0C0;
+        }
+
+        .ranking-number.third {
+            color: #CD7F32;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .item-description {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .like-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .like-btn {
+            background: none;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 1rem;
+        }
+
+        .like-btn:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .like-btn.liked {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: white;
+        }
+
+        .like-count {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .ranking-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .ranking-number {
+                margin-bottom: 10px;
+            }
+
+            .item-image {
+                margin: 0 0 15px 0;
+            }
+        }
+
+        .trophy {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 2rem;
+            opacity: 0.1;
+        }
+
+        .ranking-item:nth-child(1) .trophy {
+            opacity: 0.3;
+        }
+
+        .ranking-item:nth-child(2) .trophy {
+            opacity: 0.2;
+        }
+
+        .ranking-item:nth-child(3) .trophy {
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 香草榜 🌟</h1>
+            <p>分享你的创意，让大家来点赞投票！</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                <div class="upload-icon">📸</div>
+                <h3>点击上传图片</h3>
+                <p>支持 JPG、PNG 格式</p>
+                <input type="file" id="imageInput" accept="image/*" onchange="handleImageSelect(event)">
+            </div>
+            
+            <img id="previewImage" class="preview-image" alt="预览图片">
+            
+            <div class="form-group">
+                <label for="titleInput">标题</label>
+                <input type="text" id="titleInput" placeholder="给你的作品起个响亮的名字">
+            </div>
+            
+            <div class="form-group">
+                <label for="descInput">描述</label>
+                <input type="text" id="descInput" placeholder="简单描述一下你的作品">
+            </div>
+            
+            <button class="btn" id="uploadBtn" onclick="uploadItem()" disabled>
+                🚀 发布到榜单
+            </button>
+        </div>
+
+        <div class="ranking-section">
+            <h2 class="ranking-title">🏆 实时排行榜</h2>
+            <div id="rankingList" class="ranking-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🌟</div>
+                    <h3>榜单空空如也</h3>
+                    <p>快来上传第一个作品吧！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let items = [];
+        let selectedImage = null;
+        let likedItems = new Set();
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImage = e.target.result;
+                    const preview = document.getElementById('previewImage');
+                    preview.src = selectedImage;
+                    preview.style.display = 'block';
+                    checkFormValid();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function checkFormValid() {
+            const title = document.getElementById('titleInput').value.trim();
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            if (selectedImage && title) {
+                uploadBtn.disabled = false;
+            } else {
+                uploadBtn.disabled = true;
+            }
+        }
+
+        document.getElementById('titleInput').addEventListener('input', checkFormValid);
+        document.getElementById('descInput').addEventListener('input', checkFormValid);
+
+        function uploadItem() {
+            const title = document.getElementById('titleInput').value.trim();
+            const description = document.getElementById('descInput').value.trim();
+            
+            if (!selectedImage || !title) {
+                alert('请选择图片并填写标题！');
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                title: title,
+                description: description || '暂无描述',
+                image: selectedImage,
+                likes: 0,
+                timestamp: new Date().toLocaleString('zh-CN')
+            };
+
+            items.push(newItem);
+            
+            // 清空表单
+            document.getElementById('titleInput').value = '';
+            document.getElementById('descInput').value = '';
+            document.getElementById('imageInput').value = '';
+            document.getElementById('previewImage').style.display = 'none';
+            selectedImage = null;
+            checkFormValid();
+            
+            // 刷新排行榜
+            renderRanking();
+            
+            // 成功提示
+            showSuccessMessage();
+        }
+
+        function showSuccessMessage() {
+            const btn = document.getElementById('uploadBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ 发布成功！';
+            btn.style.background = '#4CAF50';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        function toggleLike(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
+            if (likedItems.has(itemId)) {
+                likedItems.delete(itemId);
+                item.likes--;
+            } else {
+                likedItems.add(itemId);
+                item.likes++;
+            }
+            
+            renderRanking();
+        }
+
+        function renderRanking() {
+            const rankingList = document.getElementById('rankingList');
+            
+            if (items.length === 0) {
+                rankingList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🌟</div>
+                        <h3>榜单空空如也</h3>
+                        <p>快来上传第一个作品吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按点赞数排序
+            const sortedItems = [...items].sort((a, b) => b.likes - a.likes);
+            
+            const html = sortedItems.map((item, index) => {
+                const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
+                const isLiked = likedItems.has(item.id);
+                const trophyEmoji = index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="trophy">${trophyEmoji}</div>
+                        <div class="ranking-number ${rankClass}">#${index + 1}</div>
+                        <img src="${item.image}" alt="${item.title}" class="item-image">
+                        <div class="item-info">
+                            <div class="item-title">${item.title}</div>
+                            <div class="item-description">${item.description}</div>
+                            <small style="color: #999;">发布时间: ${item.timestamp}</small>
+                        </div>
+                        <div class="like-section">
+                            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${item.id})">
+                                ${isLiked ? '❤️' : '🤍'} ${isLiked ? '已赞' : '点赞'}
+                            </button>
+                            <span class="like-count">${item.likes}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            rankingList.innerHTML = html;
+        }
+
+        // 初始化页面
+        renderRanking();
+
+        // 添加一些示例数据（可选）
+        function addSampleData() {
+            const samples = [
+                {
+                    id: 1,
+                    title: "美丽的日落",
+                    description: "今天拍到的超美日落，分享给大家",
+                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9InN1bnNldCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmE1MDA7c3RvcC1vcGFjaXR5OjEiIC8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZjcwMDA7c3RvcC1vcGFjaXR5OjEiIC8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmYzMDAwO3N0b3Atb3BhY2l0eToxIiAvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjc3Vuc2V0KSIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTAwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE0cHgiPuaXpeS4izwvdGV4dD48L3N2Zz4=",
+                    likes: 5,
+                    timestamp: new Date(Date.now() - 3600000).toLocaleString('zh-CN')
+                },
+                {
+                    id: 2,
+                    title: "可爱的小猫",
+                    description: "我家的小猫咪，超级可爱",
+                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmOGZmIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI0MCIgZmlsbD0iI2ZmYjNiMyIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iOTAiIHI9IjUiIGZpbGw9IiMzMzMiLz48Y2lyY2xlIGN4PSIxMTUiIGN5PSI5MCIgcj0iNSIgZmlsbD0iIzMzMyIvPjxwYXRoIGQ9Ik05NSAxMDUgUTEwMCAxMTAgMTA1IDEwNSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIxMDAiIHk9IjE3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY2NiIgZm9udC1zaXplPSIxNHB4Ij7lj6/niLHnmoTlsI/njKs8L3RleHQ+PC9zdmc+",
+                    likes: 8,
+                    timestamp: new Date(Date.now() - 7200000).toLocaleString('zh-CN')
+                }
+            ];
+            
+            // 如果没有数据，添加示例数据
+            if (items.length === 0) {
+                items = samples;
+                renderRanking();
+            }
+        }
+
+        // 页面加载完成后添加示例数据
+        setTimeout(addSampleData, 1000);
+    </script>
+</body>
+</html>
